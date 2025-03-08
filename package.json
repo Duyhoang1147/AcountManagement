@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Duyhoang1147/AcountManagement#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^4.21.2",
     "mongoose": "^8.12.1",
     "nodemon": "^3.1.9"
