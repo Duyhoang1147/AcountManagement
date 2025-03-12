@@ -9,7 +9,7 @@ connectDB();
 
 const SECRET_KEY = 'Yui123456';
 
-router.get('/', async (req, res) => {
+router.post('/login', async (req, res)=> {
     try{
         const {email, password} = req.body;
         const user = await account.findOne({ email });
@@ -29,3 +29,5 @@ router.get('/', async (req, res) => {
         res.status(500).json({message: "servre error", error: error.message});
     }
 });
+
+module.exports = router
