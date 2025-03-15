@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <script>
+    <script> 
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
@@ -52,12 +52,11 @@
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                window.location.href = '/profile';
+                window.location.href = '/home';
             } else {
                 document.getElementById('message').innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
             }
         });
     </script>
-
 </body>
 </html>

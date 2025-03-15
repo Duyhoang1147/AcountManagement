@@ -1,12 +1,18 @@
+//module
 const express = require('express');
 const account = require('../model/account');
-const connectDB = require('../database/mongoDB');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+//method
+const connectDB = require('../database/mongoDB');
+const checkAccount = require('../utils/checkAccount').checkAccount;
 let router = express.Router();
+
+//init
 connectDB();
 
+//variable
 const SECRET_KEY = 'Yui123456';
 
 router.post('/login', async (req, res)=> {
@@ -25,6 +31,24 @@ router.post('/login', async (req, res)=> {
 
         const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {expiresIn: '1h'});
         res.status(200).json({ message: "login successful", token, user});
+    }catch(error){
+        res.status(500).json({message: "servre error", error: error.message});
+    }
+});
+
+app.post('/register', async (req, res) => {
+    try{
+        const {name, password, email} = req.body;
+
+        const exsisAccount = await account.findOne({email});
+        if(exsisAccount) {
+            return res.status(400).json({message: "Email is Used"});
+        }
+
+        const newAccount = new account({name, password, email});
+        await newAccount.save();
+
+        res.status(200).json({newAccount}); 
     }catch(error){
         res.status(500).json({message: "servre error", error: error.message});
     }
