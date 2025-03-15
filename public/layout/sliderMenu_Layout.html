@@ -13,10 +13,10 @@
 <div class="sidebar">
     <h4 class="text-center">Menu</h4>
     <div id="before-login">
-        <a href="/login" target="content-frame" id="login-btn">Login</a>
+        <a href="#" id="login-btn">Login</a>
     </div>
     <div id="after-login" style="display: none;">
-        <a href="/profile" target="content-frame">Profile</a>
+        <a href="#" id="profile-btn">Profile</a>
         <a href="#" id="logout-btn">Logout</a>
     </div>
 </div>
@@ -26,10 +26,26 @@
         let token = localStorage.getItem("token");
 
         if (token) {
-            $("#before-login").hide();  // Ẩn menu Login
-            $("#after-login").show();   // Hiển thị menu sau khi đăng nhập
+            $("#before-login").hide();  
+            $("#after-login").show();   
         }
 
+        $("#logout-btn").click(function(event) {
+            event.preventDefault();
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.top.location.href = "/login";
+        });
+
+        $("#profile-btn").click(function(event) {
+                event.preventDefault();
+                window.top.location.href = "/profile";  // Chuyển hướng toàn bộ trang đến Profile
+            });
+
+        $("#login-btn").click(function(event) {
+                event.preventDefault();
+                window.top.location.href = "/login";
+            });
     });
 </script>
 </body>
