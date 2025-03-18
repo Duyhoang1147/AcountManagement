@@ -19,4 +19,28 @@ const authenticaToken = (req, res, next) => {
     }
 }
 
-module.exports = authenticaToken
+const authorizeRole = (...allowedRoles) => {
+    return async (req, res, next) => {
+        try {
+            // Lấy user từ database dựa trên `req.user.id`
+            const user = await account.findById(req.user.id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            // Kiểm tra quyền
+            if (!allowedRoles.includes(user.role)) {
+                return res.status(403).json({ message: "Forbidden: You do not have permission!" });
+            }
+
+            next();
+        } catch (error) {
+            res.status(500).json({ message: "Server error", error: error.message });
+        }
+    };
+};
+
+module.exports = {
+    authenticaToken,
+    authorizeRole
+}

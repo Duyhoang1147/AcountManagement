@@ -54,4 +54,19 @@ router.post('/register', async (req, res) => {
     }
 });
 
+router.get('/profile', authenticaToken, async (req, res) => {
+    try {
+        // Lấy thông tin user từ database dựa trên ID trong JWT
+        const user = await account.findById(req.user.id).select("name email role");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ user }); // Trả về dữ liệu user cho frontend
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
 module.exports = router
