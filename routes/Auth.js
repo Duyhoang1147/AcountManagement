@@ -3,10 +3,10 @@ const express = require('express');
 const account = require('../model/account');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const authenticaToken = require('../middleware/authMiddleware');
 
 //method
 const connectDB = require('../database/mongoDB');
-const checkAccount = require('../utils/checkAccount').checkAccount;
 let router = express.Router();
 
 //init
@@ -17,9 +17,9 @@ const SECRET_KEY = 'Yui123456';
 
 router.post('/login', async (req, res)=> {
     try{
-        const {email, password} = req.body;
+        const {email, password} = req.body; 
         const user = await account.findOne({ email });
-
+        console.log("Auth.js: Login");
         if(!user) {
             return res.status(400).json({message: "User not found"});
         }
@@ -29,8 +29,15 @@ router.post('/login', async (req, res)=> {
             return res.status(400).json({message: "Password not correct"});
         }
 
-        const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {expiresIn: '1h'});
-        res.status(200).json({ message: "login successful", token, user});
+        const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, SECRET_KEY, {expiresIn: '1h'});
+        console.log("Auth.js: Login: Token: " + token);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 3600000 
+        });
+        res.status(200).json({ message: "login successful"});
     }catch(error){
         res.status(500).json({message: "servre error", error: error.message});
     }
@@ -52,6 +59,12 @@ router.post('/register', async (req, res) => {
     }catch(error){
         res.status(500).json({message: "servre error", error: error.message});
     }
+});
+
+router.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    console.log('Logout successful');
+    res.status(200).json({message: "Logout successful"});
 });
 
 router.get('/profile', authenticaToken, async (req, res) => {

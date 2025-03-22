@@ -18,7 +18,11 @@
   "homepage": "https://github.com/Duyhoang1147/AcountManagement#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "express-ejs-layouts": "^2.5.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "nodemon": "^3.1.9"

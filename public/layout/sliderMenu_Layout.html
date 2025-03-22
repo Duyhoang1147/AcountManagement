@@ -26,7 +26,51 @@
         let token = localStorage.getItem("token");
         
         try{
-            
+            const response = await fetch("http://localhost:8080/account/profile", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Không thể xác thực người dùng.");
+            }
+
+            const data = await response.json();
+            const role = data.user.role; // Lấy role từ API
+
+            const menuItems = {
+            Admin: [
+                { name: "Dashboard", link: "/dashboard" },
+                { name: "Quản lý người dùng", link: "/users" },
+                { name: "CSDL", link: "/database" }  // Chỉ Admin có mục này
+            ],
+            Publisher: [
+                { name: "Dashboard", link: "/dashboard" },
+                { name: "Quản lý bài viết", link: "/posts" }
+            ],
+            User: [
+                { name: "Trang chủ", link: "/home" },
+                { name: "Hồ sơ", link: "/profile" },
+                { name: "Follow", link: "/follow" } // Chỉ User có mục này
+            ]
+        };
+
+        menuContainer.innerHTML = "";
+        if (menuItems[role]) {
+            menuItems[role].forEach(item => {
+                const link = document.createElement("a");
+                link.href = item.link;
+                link.textContent = item.name;
+                menuContainer.appendChild(link);
+            });
+        } else {
+            menuContainer.innerHTML = "<p>Role không hợp lệ!</p>";
+        }
+
+
         }catch(e){
             console.error(e);
         }

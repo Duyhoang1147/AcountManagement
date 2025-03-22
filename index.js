@@ -1,29 +1,35 @@
 const express = require('express');
 const path = require('path');
-const app = express();
+const cookieParser = require('cookie-parser');
 const PORT = 8080;
+
+const app = express();
+const authenticaToken = require('./middleware/authMiddleware');
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'public', 'views'));
 
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 
+app.use(express.urlencoded({ extended: true }));
 app.use('/account', require('./routes/Account'));
-app.use('/auth', require('./routes/Auth') )
+app.use('/auth', require('./routes/Auth'));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'view', 'home.html'));
+//Định tuyến
+app.get('/',authenticaToken, (req, res) => {
+    const User = req.user;
+    res.render('home', {token: User});
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'view', 'login.html'));
-});
-
-app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'view', 'profile.html'));
+    res.render('login');
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'view', 'register.html'));
+    res.render('register');
 });
 
 app.listen(PORT, () => {

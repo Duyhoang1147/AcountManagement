@@ -3,44 +3,26 @@ const jwt = require('jsonwebtoken');
 const SECRET_KEY = 'Yui123456';
 
 const authenticaToken = (req, res, next) => {
-    const token = req.header('Authorization')?.split(' ')[1];
-
-    if(!token) {
-        return res.status(400).json({ message: "You are not logged in!"});
+    const token = req.cookies?.token; // Lấy token từ cookie
+    console.log("authMiddleWare.js: start");
+    if (!token) {
+        console.log("condition");
+        req.user = null; // Không có token, không đăng nhập
+        return next();
     }
-    
-    try{
-        console.log(token);
+
+    try {
         const decoded = jwt.verify(token, SECRET_KEY);
-        req.user = decoded;
+        req.user = decoded; // Lưu thông tin user vào request
+        console.log("true");
         next();
-    }catch{
-        return res.status(400).json({ message: "Token is invalid or expired!"});
+    } catch (error) {
+        console.log("false");
+        req.user = null; // Token không hợp lệ hoặc hết hạn
+        next();
     }
 }
 
-const authorizeRole = (...allowedRoles) => {
-    return async (req, res, next) => {
-        try {
-            // Lấy user từ database dựa trên `req.user.id`
-            const user = await account.findById(req.user.id);
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
+module.exports = authenticaToken;
 
-            // Kiểm tra quyền
-            if (!allowedRoles.includes(user.role)) {
-                return res.status(403).json({ message: "Forbidden: You do not have permission!" });
-            }
 
-            next();
-        } catch (error) {
-            res.status(500).json({ message: "Server error", error: error.message });
-        }
-    };
-};
-
-module.exports = {
-    authenticaToken,
-    authorizeRole
-}
