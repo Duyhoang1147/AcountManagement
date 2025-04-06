@@ -4,9 +4,10 @@ const mongoose = require('mongoose');
 const authorSchema = new mongoose.Schema({
     name: {type: String, require: true},
     decriptions: {type: String, require: false},
+    isdelete: {type: Boolean, default: false}
 },{
     timestamps: true
 });
 
 //export
-moduke.exports = mongoose.model('author', authorSchema);
+module.exports = mongoose.model('Author', authorSchema);

@@ -6,7 +6,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <% if (token === null) { %>
+          <% if (token == null) { %>
             <li class="nav-item">
               <a class="nav-link" href="/login" id="login-btn">Login</a>
             </li>
@@ -23,23 +23,4 @@
     </div>
   </nav>
   <script>
-    document.getElementById('logout-btn').addEventListener('click', async function(event) {
-        event.preventDefault(); // Ngừng hành động mặc định của link
-
-        // Gửi yêu cầu đến backend để xóa cookie
-        const response = await fetch('/auth/logout', {
-            method: 'GET', 
-            credentials: 'include'  // Đảm bảo gửi cookie
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            // Sau khi logout thành công, chuyển hướng người dùng về trang đăng nhập
-            window.location.href = '/';
-        } else {
-            // Nếu có lỗi, hiển thị thông báo
-            alert('Logout failed: ' + data.message);
-        }
-    });
   </script>
