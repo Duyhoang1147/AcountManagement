@@ -31,9 +31,8 @@ app.use('/comment', require('./routes/comment'));
 app.use('/follow', require('./routes/follow'));
 
 //Định tuyến
-app.get('/',authenticaToken, async (req, res) => {
-    const User = req.user;
-    res.render('home', {token: User});
+app.get('/', async (req, res) => {
+    res.render('home');
 });
 
 app.get('/login', (req, res) => {
@@ -44,6 +43,17 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 
+app.get('/profile', (req, res) => {
+    res.render('profile');
+});
+
+app.get('/detail/:id', (req, res) => {
+    res.render('detail');
+});
+
+app.get('/detail/:id/:chapterId', (req, res) => {
+    res.render('chapter');
+});
 //trien khai localhost
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

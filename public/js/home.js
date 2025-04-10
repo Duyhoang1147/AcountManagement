@@ -15,15 +15,55 @@ async function fetchStories() {
                         <div class="view"><i class="fa fa-eye"></i> ${story.seen}</div>
                     </div>
                     <div class="product__item__text">
-                        <h5><a href="/story/${story._id}">${story.name}</a></h5>
+                        <h5><a href="/detail/${story._id}">${story.name}</a></h5>
                     </div>
                 </div>
             </div>
         `;
         container.innerHTML += storyCard;
     });
+
+    const setBg = document.querySelectorAll('.set-bg');
+    setBg.forEach(element => {
+        const bg = element.getAttribute('data-setbg');
+        element.style.backgroundImage = `url(${bg})`;
+    });
 }
 
+async function fetchCategories() {
+    const response = await fetch('http://localhost:8080/category');
+    const data = await response.json();
+    const containercategory = document.getElementById('category-container');
+    containercategory.innerHTML = '';
+    if (data.length === 0) {
+        containercategory.innerHTML = '<p>No categories available</p>';
+    }
+
+    data.forEach(category => {
+        const listcategory = `
+            <li><a href="">${category.name}</a></li>
+        `;
+        containercategory.innerHTML += listcategory;
+    });
+}
+
+async function logiAndLogout() {
+    const userInfo = document.getElementById('user-info');
+    const response = await fetch('/auth/me', {
+        method: 'GET',
+        credentials: 'include' // Gửi cookie kèm request
+      });
+    if(response.ok) {
+        const data = await response.json();
+        userInfo.innerHTML += `
+            <a href="/auth/logout">logout</a>
+        `;  
+    } else {
+        userInfo.innerHTML += `
+            <a href="/login">login</a>
+        `;
+    }
+}
 // document.getElementById('logout-btn').addEventListener('click', async function (event) {
 //     event.preventDefault(); // Ngừng hành động mặc định của link
 
@@ -44,4 +84,6 @@ async function fetchStories() {
 //     }
 // });
 
+logiAndLogout();
 fetchStories();
+fetchCategories();

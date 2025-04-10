@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({message: "Email is Used"});
         }
 
-        const newAccount = new account({name, password, email, phone, address});
+        const newAccount = new account({name, password, email, phone, address, role: 'user'});
         await newAccount.save();
 
         res.status(200).json({newAccount}); 
@@ -70,7 +70,7 @@ router.put('/:id', async (req, res) => {
             Account.phone = phone;
             Account.address = address;
             await Account.save();
-            res.status(200).json({Account}); 
+            res.status(200).json({message: "Account updated"}); 
         }
     }catch(error){
         res.status(500).json({message: "servre error", error: error.message});

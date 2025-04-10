@@ -21,12 +21,12 @@ router.post('/login', async (req, res)=> {
         const user = await account.findOne({ email });
         console.log("Auth.js: Login");
         if(!user) {
-            return res.status(400).json({message: "User not found"});
+            return res.status(400).json({error: "User not found"});
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) {
-            return res.status(400).json({message: "Password not correct"});
+            return res.status(400).json({error: "Password not correct"});
         }
 
         const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, SECRET_KEY, {expiresIn: '1h'});
@@ -76,10 +76,27 @@ router.get('/profile', authenticaToken, async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.json({ user }); // Trả về dữ liệu user cho frontend
+        res.status(200).json({ user }); // Trả về dữ liệu user cho frontend
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+
+//lay thong tin nguoi dung dang nhap
+router.get('/me', async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if(!token) return res.status(401).json({ error: 'Unauthorized 1' });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const user = await account.findById(decoded.id).select("-password");
+        if(user === null) return res.status(401).json({error: 'Unauthorized 2'});
+
+        res.json({user});
+    } catch(erorr) {
+        console.log(error);
+        res.status(401).json({ error: 'Invalid token or token expired' });
+    }
+})
 
 module.exports = router

@@ -12,7 +12,7 @@ const getAllStory = async (req, res) => {
         const stories = await Story.find({isdelete: false})
         .populate('category')
         .populate('author')
-
+        .populate('chapter').select('-content')
         res.status(200).json(stories);
     } catch(error) {
         res.status(500).json({message: 'Internal server error:' + error});
@@ -30,7 +30,7 @@ const getStorybyId = async (req, res) => {
         if(story === null) {
             res.status(400).json({message: 'Story not found'});
         }
-        res.status(200).json({message: 'Story found', story});
+        res.status(200).json({story});
     } catch(error) {
         res.status(500).json({message: 'Internal server error: ' + error});
     }
@@ -41,6 +41,7 @@ const createStory = async (req, res) => {
         // khai bao bien
         const {name, subname, authorid, posterid, decriptions, chapter, category} = req.body;
         const folderpath = path.join(__dirname, '..', 'data', formatFileName(name));
+        const filePathImage = path.posix.join('data', formatFileName(name), req.file.originalname);
         const filePath = path.posix.join(folderpath, req.file.originalname);
         
         //kiem tra du lieu dau vao
@@ -53,13 +54,13 @@ const createStory = async (req, res) => {
         await Story.create({
             name: name,
             subname: subname,
-            authorid: authorid,
-            posterid: posterid,
+            author: authorid,
+            poster: posterid,
             decriptions: decriptions,
             chapter: chapter,
             location: folderpath,
             category: categories,
-            URLimage: filePath
+            URLimage: filePathImage,
         });
 
         //tao thu muc luu truyen
