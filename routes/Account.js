@@ -2,7 +2,7 @@ const express = require('express');
 let router = express.Router();
 const account = require('../model/account');
 const connectDB = require('../database/mongoDB');
-const authenticaToken = require('../middleware/authMiddleware');
+const authenticaToken= require('../middleware/authMiddleware');
 
 connectDB();
 
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     }   
 });
 
-router.get('/:id',authenticaToken,async (req, res) => {
+router.get('/:id', async (req, res) => {
     try{
         const {id} = req.params;
         const Account = await account.findById(id);
@@ -29,7 +29,7 @@ router.get('/:id',authenticaToken,async (req, res) => {
     }   
 });
 
-router.get('/profile', authenticaToken, async (req, res) => {
+router.get('/profile', async (req, res) => {
     res.json({ message: 'Chào mừng đến với trang profile!', user: req.user });
 });
 
@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
             return res.status(400).json({message: "Email is Used"});
         }
 
-        const newAccount = new account({name, password, email, phone, address});
+        const newAccount = new account({name, password, email, phone, address, role: 'user'});
         await newAccount.save();
 
         res.status(200).json({newAccount}); 
@@ -70,7 +70,7 @@ router.put('/:id', async (req, res) => {
             Account.phone = phone;
             Account.address = address;
             await Account.save();
-            res.status(200).json({Account}); 
+            res.status(200).json({message: "Account updated"}); 
         }
     }catch(error){
         res.status(500).json({message: "servre error", error: error.message});

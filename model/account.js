@@ -7,8 +7,10 @@ const accountSchema = new mongoose.Schema({
   email: {type: String, required: true},
   phone: {type: String, required: false},
   address: {type: String, required: false},
-  createAt: {type: Date, default: Date.now},
+  role: {type: String, required: true, enum: ['admin', 'user', 'publisher'], default: 'user'},
   isDeleted: {type: Boolean, default: false}
+},{
+  timestamps: true
 });
 
 //middleware
@@ -32,6 +34,4 @@ accountSchema.methods.comparePassword = async function(candidatePassword) {
 }
 
 //export
-const account = mongoose.model('account', accountSchema);
-
-module.exports = account;
+module.exports = mongoose.model('account', accountSchema);
