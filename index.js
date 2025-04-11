@@ -54,6 +54,12 @@ app.get('/detail/:id', (req, res) => {
 app.get('/detail/:id/:chapterId', (req, res) => {
     res.render('chapter');
 });
+
+//admin router
+app.get('/admin', (req, res) => {
+    res.render('partials/navadmin');
+});
+
 //trien khai localhost
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
