@@ -2,12 +2,13 @@ const Follow = require('../model/follow');
 
 const getAllFollowByUserId = async (req, res) => {
     try {
-        const {userid} = req.body;
-        const follows = await Follow.find({userId: userid});
+        const {id} = req.params;
+        const follows = await Follow.find({userId: id})
+        .populate('storyId');
         if(follows === null) {
             res.status(400).json({message: 'follow not found'});
         }
-        res.status(200).json(follows);
+        res.status(200).json({follows});
     } catch(err) {
         res.status(500).json({message: 'Internal server error: ' + err});
     }

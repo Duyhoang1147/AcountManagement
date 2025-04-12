@@ -6,6 +6,7 @@ const upload = multer({dest: 'data/uploads/'});
 
 router.get('/', storyController.getAllStory);
 router.get('/:id', storyController.getStorybyId);
+router.get('/category/:id', storyController.getStrorybyCategory);
 router.post('/', upload.single('image'), storyController.createStory);
 router.put('/:id', storyController.updateStory);
 router.delete('/:id', storyController.deleteStory);

@@ -37,6 +37,18 @@ const getCommentById = async (req, res) => {
     }
 }
 
+const getCommentByStoryId = async (req, res) => { 
+    try {
+        const {storyid} = req.params;
+        const comments = await Comment.find({storyId: storyid})
+        .populate('userId', 'name')
+
+        res.status(200).json({comments});
+    } catch(err) {
+        res.status(500).json({message: 'Internal server error: ' + err});
+    }
+}
+
 const editComment = async (req, res) => {
     try {
         const {id} = req.params;
@@ -74,5 +86,5 @@ module.exports = {
     getCommentById,
     editComment,
     deleteComment,
-
+    getCommentByStoryId,
 }
