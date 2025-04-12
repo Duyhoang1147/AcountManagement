@@ -80,6 +80,7 @@ const createStory = async (req, res) => {
             category: categories,
             URLimage: filePathImage,
         });
+        
 
         //tao thu muc luu truyen
         if(!fs.existsSync(folderpath)) {

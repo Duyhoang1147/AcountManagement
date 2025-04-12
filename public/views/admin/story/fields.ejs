@@ -1,0 +1,133 @@
+<div class="form-group mb-3">
+    <label for="name">Tên truyện</label>
+    <input type="text" class="form-control" name="name" id="name" required>
+</div>
+
+<div class="form-group mb-3">
+    <label for="subname">Tên phụ</label>
+    <input type="text" class="form-control" name="subname" id="subname">
+</div>
+
+<div class="form-group mb-3">
+    <label for="description">Mô tả</label>
+    <textarea class="form-control" name="decriptions" id="description" rows="3"></textarea>
+</div>
+
+<div class="form-group mb-3">
+    <label for="authorId">Tác giả</label>
+    <input type="text" class="form-control" name="author" id="authorId" list="authorList" required>
+    <datalist id="authorList">
+    </datalist>
+</div>
+
+<div class="form-group mb-3">
+    <label for="categoryId">Thể loại</label>
+    <div class="input-group">
+        <input type="text" class="form-control" name="category" id="categoryId" list="categoryList">
+        <button class="btn btn-outline-secondary" type="button" id="addCategoryBtn">Chọn</button>
+    </div>
+    <datalist id="categoryList">
+    </datalist>
+    <div id="selectedCategories" class="mt-2 d-flex flex-wrap gap-2"></div>
+</div>
+
+<div class="form-group mb-3">
+    <label for="URLimage">Ảnh bìa</label>
+    <div class="d-flex align-items-center gap-3">
+        <img id="currentImage" src="" alt="Ảnh bìa hiện tại" style="max-width: 200px; max-height: 200px; display: none;">
+        <input type="file" class="form-control" name="image" id="URLimage" accept="image/*">
+    </div>
+</div>
+
+<div class="form-group mb-3">
+    <label for="status">Trạng thái</label>
+    <select class="form-control" name="status" id="status" required>
+        <option value="Đang tiến hành">Đang tiến hành</option>
+        <option value="Đã hoàn thành">Đã hoàn thành</option>
+    </select>
+</div>
+
+
+<script>
+    const app = "http://localhost:8080/";
+    const url = "story/";
+    let authors = [];
+    let categories = [];
+
+    // Load authors
+    fetch(app + "author")
+        .then(res => res.json())
+        .then(data => {
+            authors = data.authors;
+            const authorList = document.getElementById('authorList');
+            authors.forEach(author => {
+                const option = document.createElement('option');
+                option.value = author.name;
+                option.setAttribute('data-id', author._id);
+                authorList.appendChild(option);
+            });
+        });
+
+    // Load categories
+    fetch(app + "category")
+        .then(res => res.json())
+        .then(data => {
+            categories = data;
+            const categoryList = document.getElementById('categoryList');
+            data.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.setAttribute('data-id', category._id);
+                categoryList.appendChild(option);
+            });
+        });
+    // Handle category selection
+    const categoryInput = document.getElementById('categoryId');
+    const addCategoryBtn = document.getElementById('addCategoryBtn');
+    const selectedCategories = document.getElementById('selectedCategories');
+    const selectedCategoryIds = new Set();
+
+    addCategoryBtn.addEventListener('click', function() {
+        const inputValue = categoryInput.value.trim();
+        if (inputValue) {
+            const category = categories.find(cat => {
+                return cat.name.trim() === inputValue;
+            });
+            if (category && !selectedCategoryIds.has(category._id)) {
+                selectedCategoryIds.add(category._id);
+                const categoryTag = document.createElement('div');
+                categoryTag.className = 'd-flex align-items-center bg-light p-2 rounded';
+                categoryTag.innerHTML = `
+                    <span class="me-2">${category.name}</span>
+                    <input type="hidden" name="category[]" value="${category._id}">
+                    <i class="fas fa-times text-danger cursor-pointer" style="cursor: pointer;"></i>
+                `;
+                categoryTag.querySelector('i').addEventListener('click', function() {
+                    selectedCategoryIds.delete(category._id);
+                    categoryTag.remove();
+                });
+                selectedCategories.appendChild(categoryTag);
+                categoryInput.value = '';
+            } else {
+                console.log('Category not found or already selected');
+            }
+        }
+    });
+
+    // Preview image when selected
+    document.getElementById('URLimage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const currentImage = document.getElementById('currentImage');
+                currentImage.src = e.target.result;
+                currentImage.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 

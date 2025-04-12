@@ -1,0 +1,118 @@
+<div class="container mt-5" style="max-width: 90%;">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Sửa truyện</h4>
+      <a href="/admin/stories" class="btn btn-danger">Trở về</a>
+    </div>
+    <div class="card-body">
+      <form id="edit-form">
+        <%- include('fields') %>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const appEdit = "http://localhost:8080/";
+  const urlEdit = "story/";
+  const storyId = window.location.pathname.split("/").pop();
+
+  // Load story data and fill form
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      // Load story data
+      const storyRes = await fetch(appEdit + urlEdit + storyId);
+      const jsonData = await storyRes.json();
+      const story = jsonData.story;
+
+      console.log(story);
+      
+      // Fill form fields
+      document.getElementById("name").value = story.name || "";
+      document.getElementById("subname").value = story.subname || "";
+      document.getElementById("description").value = story.decriptions || "";
+      document.getElementById("status").value = story.status || "Đang tiến hành";
+
+      // Fill current image
+      const currentImage = document.getElementById("currentImage");
+      if (story.URLimage) {
+        currentImage.src = "/" + story.URLimage;
+        currentImage.style.display = "block";
+      }
+
+      // Fill author
+      const authorInput = document.getElementById("authorId");
+      const authorOption = document.querySelector(`#authorList option[data-id="${story.author?._id}"]`);
+      if (authorOption) {
+        authorInput.value = authorOption.value;
+      }
+
+      // Fill categories
+      const selectedCategories = document.getElementById("selectedCategories");
+      if (story.category && story.category.length > 0) {
+        story.category.forEach(cat => {
+          const categoryTag = document.createElement('div');
+          categoryTag.className = 'd-flex align-items-center bg-light p-2 rounded';
+          categoryTag.innerHTML = `
+            <span class="me-2">${cat.name}</span>
+            <input type="hidden" name="category[]" value="${cat._id}">
+            <i class="fas fa-times text-danger cursor-pointer" style="cursor: pointer;"></i>
+          `;
+          categoryTag.querySelector('i').addEventListener('click', function() {
+            categoryTag.remove();
+          });
+          selectedCategories.appendChild(categoryTag);
+        });
+      }
+    } catch (error) {
+      console.error("Error loading story data:", error);
+      alert("Không thể tải dữ liệu truyện");
+    }
+  });
+
+  // Handle form submission
+  document.getElementById("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    
+    // Add text fields
+    formData.append('name', document.getElementById("name").value);
+    formData.append('subname', document.getElementById("subname").value);
+    formData.append('decriptions', document.getElementById("description").value);
+    formData.append('status', document.getElementById("status").value);
+    formData.append('location', document.getElementById("location").value);
+
+    // Add image if changed
+    const imageFile = document.getElementById("URLimage").files[0];
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    // Add author ID
+    const authorInput = document.getElementById('authorId');
+    const authorOption = document.querySelector(`#authorList option[value="${authorInput.value}"]`);
+    const authorId = authorOption ? authorOption.getAttribute('data-id') : null;
+    formData.append('authorid', authorId);
+
+    // Add category IDs
+    const categoryInputs = document.querySelectorAll('input[name="category[]"]');
+    categoryInputs.forEach(input => {
+      formData.append('category', input.value);
+    });
+
+    const res = await fetch(appEdit + urlEdit + storyId, {
+      method: "PUT",
+      body: formData
+    });
+
+    if (res.ok) {
+      alert("Cập nhật thành công");
+      location.href = "/admin/stories";
+    } else {
+      const text = await res.text();
+      alert(`Cập nhật thất bại (${res.status}): ${text}`);
+    }
+  });
+</script> 

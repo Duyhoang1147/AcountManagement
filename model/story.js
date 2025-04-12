@@ -5,7 +5,7 @@ const storySchema = new mongoose.Schema({
     name: {type: String, required: true},
     subname: {type: String, required: false},
     author: {type: mongoose.Schema.Types.ObjectId, ref: 'Author'},
-    poster: {type: mongoose.Schema.Types.ObjectId, ref: 'Account'},
+    poster: {type: mongoose.Schema.Types.ObjectId, ref: 'Account', required: false},
     category:[{ type: mongoose.Schema.Types.String, ref: 'Category' }],
     URLimage: {type: String, required: true},
     decriptions: {type: String, required: false},

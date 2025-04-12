@@ -1,0 +1,102 @@
+<div class="form-group mb-3">
+    <label for="storyId">Truyện</label>
+    <input type="text" class="form-control" name="storyid" id="storyId" list="storyList" required autocomplete="off">
+    <datalist id="storyList">
+    </datalist>
+</div>
+
+<div class="form-group mb-3">
+    <label for="chapterNumber">Chapter Number</label>
+    <input type="number" class="form-control" name="chapterNumber" id="chapterNumber" required>
+</div>
+
+<div class="form-group mb-3">
+    <label for="title">Tiêu đề chương</label>
+    <input type="text" class="form-control" name="title" id="title" required>
+</div>
+
+<div class="form-group mb-3">
+    <label for="images">Ảnh nội dung</label>
+    <input type="file" class="form-control" name="images" id="images" accept="image/*" multiple required>
+    <div id="selectedImages" class="mt-2">
+        <!-- Selected images displayed -->
+    </div>
+</div>
+
+<script>
+    const app = "http://localhost:8080/";
+    const url = "chapter/";
+    const selectedFiles = new Set(); // Track selected files
+
+    // Handle image selection
+    document.getElementById('images').addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        const container = document.getElementById('selectedImages');
+        
+        files.forEach(file => {
+            if (!selectedFiles.has(file.name)) {
+                selectedFiles.add(file.name);
+                
+                const div = document.createElement('div');
+                div.className = 'd-flex align-items-center justify-content-between bg-light p-2 mb-2 rounded';
+                div.innerHTML = `
+                    <span>${file.name}</span>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeImage(this, '${file.name}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            }
+        });
+    });
+
+    // Function to remove image
+    window.removeImage = function(button, fileName) {
+        selectedFiles.delete(fileName);
+        button.parentElement.remove();
+        
+        // Update file input
+        const dataTransfer = new DataTransfer();
+        const input = document.getElementById('images');
+        Array.from(input.files)
+            .filter(file => selectedFiles.has(file.name))
+            .forEach(file => dataTransfer.items.add(file));
+        input.files = dataTransfer.files;
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch(app + "story")
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                const storyList = document.getElementById('storyList');
+                storyList.innerHTML = '';
+                
+                // Check if data is an array or has a stories property
+                const stories = Array.isArray(data) ? data : (data.stories || []);
+                
+                stories.forEach(story => {
+                    const option = document.createElement('option');
+                    option.value = story.name;
+                    option.setAttribute('data-id', story._id);
+                    storyList.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading stories:', error);
+            });
+    });
+
+    // Handle story selection
+    document.getElementById('storyId').addEventListener('input', function() {
+        const selectedOption = document.querySelector(`#storyList option[value="${this.value}"]`);
+        if (selectedOption) {
+            this.setAttribute('data-id', selectedOption.getAttribute('data-id'));
+        } else {
+            this.removeAttribute('data-id');
+        }
+    });
+</script>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
