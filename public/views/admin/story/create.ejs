@@ -1,0 +1,60 @@
+<div class="container mt-5" style="max-width: 90%;">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Thêm truyện</h4>
+      <a href="/admin/stories" class="btn btn-danger">Trở về</a>
+    </div>
+    <div class="card-body">
+      <form id="create-form">
+        <%- include('fields') %>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const appCreate = "http://localhost:8080/";
+  const urlCreate = "story/";
+
+  document.getElementById("create-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    
+    // Thêm các trường text
+    formData.append('name', document.getElementById("name").value);
+    formData.append('subname', document.getElementById("subname").value);
+    formData.append('decriptions', document.getElementById("description").value);
+    formData.append('status', document.getElementById("status").value);
+
+    // Thêm file ảnh
+    const imageFile = document.getElementById("URLimage").files[0];
+    formData.append('image', imageFile);
+
+    // Thêm author ID
+    const authorInput = document.getElementById('authorId');
+    const authorOption = document.querySelector(`#authorList option[value="${authorInput.value}"]`);
+    const authorId = authorOption ? authorOption.getAttribute('data-id') : null;
+    formData.append('authorid', authorId);
+
+    // Thêm category IDs
+    const categoryInputs = document.querySelectorAll('input[name="category[]"]');
+    categoryInputs.forEach(input => {
+      formData.append('category', input.value);
+    });
+
+    const res = await fetch(appCreate + urlCreate, {
+      method: "POST",
+      body: formData
+    });
+
+    if (res.ok) {
+      alert("Thêm thành công");
+      location.href = "/admin/stories";
+    } else {
+      const text = await res.text();
+      alert(`Thêm thất bại (${res.status}): ${text}`);
+    }
+  });
+</script> 

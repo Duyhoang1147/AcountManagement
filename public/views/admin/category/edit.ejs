@@ -1,0 +1,49 @@
+<div class="container mt-5" style="max-width: 90%;">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Sửa thể loại</h4>
+      <a href="/admin/categories" class="btn btn-danger">Trở về</a>
+    </div>
+    <div class="card-body">
+      <form id="edit-form">
+        <%- include('fields') %>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const appEdit = "http://localhost:8080/";
+  const urlEdit = "category/";
+  const categoryId = window.location.pathname.split("/").slice(-1)[0];
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    const res = await fetch(appEdit + urlEdit + categoryId);
+    const data = await res.json();
+    const { name } = data;
+
+    document.getElementById("name").value = data.name || "";
+  });
+
+  document.getElementById("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = {
+      name: document.getElementById("name").value,
+    };
+
+    const res = await fetch(appEdit + urlEdit + categoryId, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (res.ok) {
+      alert("Cập nhật thành công");
+      location.href = "/admin/categories";
+    } else {
+      const text = await res.text();
+      alert(`Cập nhật thất bại (${res.status}): ${text}`);
+    }
+  });
+</script> 

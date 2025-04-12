@@ -1,0 +1,115 @@
+<div class="d-flex gap-3 mb-3">
+    <div class="flex-grow-1">
+        <input type="text" class="form-control" id="storySearch" list="storyList" placeholder="Tìm truyện...">
+        <datalist id="storyList">
+        </datalist>
+    </div>
+    <button class="btn btn-primary" onclick="showChapters()">Hiện chapter</button>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Chapter Number</th>
+            <th>Tiêu đề</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody id="chapter-table-body">
+        <!-- Dữ liệu sẽ được JS render vào đây -->
+    </tbody>
+</table>
+
+<script>
+    const appTable = "http://localhost:8080/";
+    const urlTable = "chapter/";
+
+    // Load stories for datalist
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch(appTable + "story")
+            .then(res => res.json())
+            .then(data => {
+                const storyList = document.getElementById('storyList');
+                storyList.innerHTML = ''; // Clear
+                
+                const stories = Array.isArray(data) ? data : (data.stories || []);
+                
+                stories.forEach(story => {
+                    const option = document.createElement('option');
+                    option.value = story.name;
+                    option.setAttribute('data-id', story._id);
+                    storyList.appendChild(option);
+                });
+            });
+    });
+
+    // Handle story selection
+    document.getElementById('storySearch').addEventListener('input', function() {
+        const selectedOption = document.querySelector(`#storyList option[value="${this.value}"]`);
+        if (selectedOption) {
+            this.setAttribute('data-id', selectedOption.getAttribute('data-id'));
+        } else {
+            this.removeAttribute('data-id');
+        }
+    });
+
+    function showChapters() {
+        const storyInput = document.getElementById('storySearch');
+        const storyId = storyInput.getAttribute('data-id');
+        
+        if (!storyId) {
+            alert('Vui lòng chọn truyện tồn tại');
+            return;
+        }
+
+        // First get story
+        fetch(appTable + "story/" + storyId)
+        .then(res => res.json())
+        .then(storyData => {
+            if (!storyData || !storyData.story.chapter) {
+                renderTable([]);
+                return;
+            }
+            
+            // Then get chapters from the story
+            const chapters = storyData.story.chapter;
+            renderTable(chapters);
+        })
+        .catch(error => {
+            console.error('Error fetching chapters:', error);
+            alert('Lỗi khi tải danh sách chương');
+        });
+    }
+
+    function renderTable(chapters) {
+        const tbody = document.getElementById("chapter-table-body");
+
+        if (!chapters || chapters.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = chapters.map((item, index) => `
+            <tr>
+                <td>${item.chapterNumber}</td>
+                <td>${item.title}</td>
+                <td>
+                    <a href="/admin/chapters/edit/${item._id}" class="btn btn-warning btn-sm">Sửa</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('${item._id}')">Xoá</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function confirmDelete(id) {
+        if (confirm("Bạn có chắc chắn muốn xoá?")) {
+            fetch(appTable + urlTable + "removeChapter/" + id, {
+                method: "DELETE",
+            })
+            .then(res => {
+                if (res.ok) location.reload();
+                else res.json().then(data => alert(`Xoá thất bại (${res.status}): ${data.message || 'Không xác định'}`));
+            });
+        }
+    }
+</script> 

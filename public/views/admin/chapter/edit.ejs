@@ -1,0 +1,67 @@
+<div class="container mt-5" style="max-width: 90%;">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Sửa chương</h4>
+      <a href="/admin/chapters" class="btn btn-danger">Trở về</a>
+    </div>
+    <div class="card-body">
+      <form id="edit-form">
+        <%- include('fields') %>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const appEdit = "http://localhost:8080/";
+  const urlEdit = "chapter/";
+  const chapterId = window.location.pathname.split("/").slice(-2)[0];
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Load chapter data
+    const res = await fetch(appEdit + urlEdit + "getChapterById/" + chapterId);
+    const data = await res.json();
+
+    if (data.chapter) {
+      document.getElementById("storyId").value = data.chapter.storyId?.name || "";
+      document.getElementById("storyId").setAttribute('data-id', data.chapter.storyId?._id || "");
+      document.getElementById("chapterNumber").value = data.chapter.chapterNumber || "";
+      document.getElementById("title").value = data.chapter.title || "";
+    }
+  });
+
+  document.getElementById("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    
+    // Get story ID from the input's data-id attribute
+    const storyId = document.getElementById("storyId").getAttribute('data-id');
+    if (!storyId) {
+      alert("Vui lòng chọn truyện hợp lệ");
+      return;
+    }
+
+    formData.append('storyid', storyId);
+    formData.append('chapterNumber', document.getElementById("chapterNumber").value);
+    formData.append('title', document.getElementById("title").value);
+    
+    const images = document.getElementById("images").files;
+    for (let i = 0; i < images.length; i++) {
+      formData.append('images', images[i]);
+    }
+
+    const res = await fetch(appEdit + urlEdit + chapterId, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (res.ok) {
+      alert("Cập nhật thành công");
+      location.href = "/admin/chapters";
+    } else {
+      const text = await res.text();
+      alert(`Cập nhật thất bại (${res.status}): ${text}`);
+    }
+  });
+</script> 

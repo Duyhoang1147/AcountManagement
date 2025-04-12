@@ -1,0 +1,70 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Ảnh</th>
+            <th>Tên truyện</th>
+            <th>Tên phụ</th>
+            <th>Tác giả</th>
+            <th>Thể loại</th>
+            <th>Trạng thái</th>
+            <th>Lượt xem</th>
+            <th>Lượt thích</th>
+            <th>Lượt theo dõi</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody id="story-table-body">
+        <!-- Dữ liệu sẽ được JS render vào đây -->
+    </tbody>
+</table>
+
+<script>
+    const appTable = "http://localhost:8080/";
+    const urlTable = "story/";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const response = await fetch(appTable + urlTable);
+        const stories = await response.json();
+        const tbody = document.getElementById("story-table-body");
+
+        if (!stories || stories.length == 0) {
+            tbody.innerHTML = `<tr><td colspan="11" class="text-center">Không có dữ liệu</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = stories.map((item, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>
+                    <img src="${"/" +item.URLimage || ''}" alt="${item.name}" 
+                         style="max-width: 100px; max-height: 100px; object-fit: cover;">
+                </td>
+                <td>${item.name}</td>
+                <td>${item.subname || ''}</td>
+                <td>${item.author?.name || ""}</td>
+                <td>${item.category?.map(cat => cat.name).join(', ') || ""}</td>
+                <td>${item.status || ""}</td>
+                <td>${item.seen || 0}</td>
+                <td>${item.like || 0}</td>
+                <td>${item.follow || 0}</td>
+                <td>
+                    <a href="/admin/stories/edit/${item._id}" class="btn btn-warning btn-sm">Sửa</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('${item._id}')">Xoá</button>
+                </td>
+            </tr>
+        `).join('');
+    });
+
+    function confirmDelete(id) {
+        if (confirm("Bạn có chắc chắn muốn xoá?")) {
+            fetch(appTable + urlTable + id, {
+                method: "DELETE",
+            })
+            .then(res => {
+                if (res.ok) location.reload();
+                else res.text().then(text => alert(`Xoá thất bại (${res.status}): ${text}`));
+            });
+        }
+    }
+</script> 

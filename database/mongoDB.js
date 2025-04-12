@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const LinkDB = 'mongodb://localhost:27017/test';
+const LinkDB = 'mongodb://127.0.0.1:27017/test';
 
 const conectDB = async () => {
   try {

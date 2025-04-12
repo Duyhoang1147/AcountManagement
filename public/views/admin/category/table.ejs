@@ -1,0 +1,50 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Tên thể loại</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody id="category-table-body">
+        <!-- Dữ liệu sẽ được JS render vào đây -->
+    </tbody>
+</table>
+
+<script>
+    const appTable = "http://localhost:8080/";
+    const urlTable = "category/";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const categories = await (await fetch(appTable + urlTable)).json();
+        const tbody = document.getElementById("category-table-body");
+
+        if (!categories || categories.length == 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center">Không có dữ liệu</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = categories.map((item, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.name}</td>
+                <td>
+                    <a href="/admin/categories/edit/${item._id}" class="btn btn-warning btn-sm">Sửa</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('${item._id}')">Xoá</button>
+                </td>
+            </tr>
+        `).join('');
+    });
+
+    function confirmDelete(id) {
+        if (confirm("Bạn có chắc chắn muốn xoá?")) {
+            fetch(appTable + urlTable + id, {
+                method: "DELETE",
+            })
+            .then(res => {
+                if (res.ok) location.reload();
+                else res.text().then(text => alert(`Xoá thất bại (${res.status}): ${text}`));
+            });
+        }
+    }
+</script> 

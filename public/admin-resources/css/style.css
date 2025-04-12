@@ -88,6 +88,16 @@ a:hover { text-decoration: none; }
 /* Form */
 #sidebar-scrollbar { height: 100%; }
 
+/* Content Wrapper */
+.content-wrapper {
+  margin-left: 300px;
+  transition: all 0.3s ease-in-out;
+}
+
+body.sidebar-main .content-wrapper {
+  margin-left: 80px;
+}
+
 /*---------------------------------------------------------------------
                                   Badge
 -----------------------------------------------------------------------*/
@@ -1177,3 +1187,53 @@ Add User Page
 -----------------------------------------------------------------------*/
 .add-img-user .p-image { position: static; text-align: left; display: block; height: auto; width: auto; background: transparent; margin-top: 20px; }
 .img-extension a, .img-extension span { color: var(--iq-body-text); padding: 0 3px; font-size: 13px; }
+
+/* Sidebar Animation */
+.iq-sidebar {
+  transition: all 2s ease;
+  -webkit-transition: all 2s ease;
+  -moz-transition: all 2s ease;
+  -o-transition: all 2s ease;
+}
+
+/* Content Animation */
+.content-wrapper {
+  transition: all 2s ease;
+  -webkit-transition: all 2s ease;
+  -moz-transition: all 2s ease;
+  -o-transition: all 2s ease;
+}
+
+/* When sidebar is collapsed */
+body.sidebar-main .iq-sidebar {
+  width: 80px;
+  transition: all 2s ease;
+  -webkit-transition: all 2s ease;
+  -moz-transition: all 2s ease;
+  -o-transition: all 2s ease;
+}
+
+body.sidebar-main .content-wrapper {
+  margin-left: 80px;
+  transition: all 2s ease;
+  -webkit-transition: all 2s ease;
+  -moz-transition: all 2s ease;
+  -o-transition: all 2s ease;
+}
+
+/* When sidebar is expanded */
+body.sidebar-main .iq-sidebar:hover {
+  width: 300px;
+  transition: all 2s ease;
+  -webkit-transition: all 2s ease;
+  -moz-transition: all 2s ease;
+  -o-transition: all 2s ease;
+}
+
+body.sidebar-main .iq-sidebar:hover ~ .content-wrapper {
+  margin-left: 300px;
+  transition: all 2s ease;
+  -webkit-transition: all 2s ease;
+  -moz-transition: all 2s ease;
+  -o-transition: all 2s ease;
+}
