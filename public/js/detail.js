@@ -1,3 +1,8 @@
+function formatDate(isoString) {
+    const d = new Date(isoString);
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  }
+
 async function getStory() {
     const pathSegments = window.location.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
@@ -54,7 +59,23 @@ async function getStory() {
 }
 
 async function getComment() {
-    
+    const pathSegments = window.location.pathname.split('/');
+    const storyId = pathSegments[pathSegments.length - 1];
+
+    const response = await fetch(`http://localhost:8080/comment/storyComment/${storyId}`);
+    const data = await response.json();
+    const Container = document.getElementById('review');
+    Container.innerHTML = '';
+
+    data.comments.forEach(com=> {
+        const commentContent = `
+            <div class="anime__review__item__text" style="margin-bottom: 20px;">
+                <h6>${com.userId.name}</h6>
+                <p>${com.content}</p>
+            </div>
+        `;
+        Container.innerHTML += commentContent;
+    });
 }
 
 async function getStoryList() {
@@ -69,8 +90,8 @@ async function getStoryList() {
 
     data.story.chapter.forEach(chapter => {
         const chapterContent = `
-            <div class="anime__review__item__text">
-                <a href="/detail/${data.story._id}/${chapter._id}"><p>chapter ${chapter.chapterNumber}<span style="float: right;">${chapter.createdAt}</span></p></a>   
+            <div class="anime__review__item__text" style="margin-bottom: 2px;">
+                <a href="/detail/${data.story._id}/${chapter._id}"><p>chapter ${chapter.chapterNumber}<span style="float: right;">${formatDate(chapter.createdAt)}</span></p></a>   
             </div>
         `
         Container.innerHTML += chapterContent;
@@ -104,8 +125,10 @@ document.getElementById('comment').addEventListener('submit', async function (ev
         if (response.ok) {
             window.location.reload();
         }
+
     }
 });
 
-getStoryList()
+getComment();
+getStoryList();
 getStory();

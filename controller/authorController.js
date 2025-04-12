@@ -13,7 +13,7 @@ const getAllAuthors = async (req, res) => {
 const getAuthorbyId = async (req, res) => {
     try {
         const {id} = req.params;
-        const author = await Author.findOne({_id: id, isdelete: false}).select('name, decriptions');
+        const author = await Author.findOne({_id: id, isdelete: false}).select('name decriptions');
         if(author === null) {
             res.status(404).json({message: 'Author not found'});
         } else {

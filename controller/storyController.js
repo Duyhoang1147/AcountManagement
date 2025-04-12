@@ -36,6 +36,24 @@ const getStorybyId = async (req, res) => {
     }
 }
 
+const getStrorybyCategory = async (req, res) => {
+    try {
+        const {id} = req.params
+        const stories = await Story.find({category: id, isdelete: false})
+        .populate('category', '_id name')
+        .populate('author', '_id name')
+
+        if(stories === null) {
+            res.status(400).json({message: 'Story not found'});
+        }
+
+        res.status(200).json({stories});
+    } catch(error) {
+        res.status(500).json({message: 'Internal server error: ' + error});
+    }
+}
+
+
 const createStory = async (req, res) => {
     try {
         // khai bao bien
@@ -177,6 +195,7 @@ const removeStory = async (req, res) => {
 module.exports = {
     getAllStory,
     getStorybyId,
+    getStrorybyCategory,
     createStory,
     updateStory,
     deleteStory,

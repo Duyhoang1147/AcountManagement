@@ -2,7 +2,6 @@ async function fetchStories() {
     const response = await fetch('http://localhost:8080/story');
     const data = await response.json();
     const container = document.getElementById('story-container');
-    container.innerHTML = '';
     if (data.length === 0) {
         container.innerHTML = '<p>No stories available</p>';
     }
@@ -41,7 +40,7 @@ async function fetchCategories() {
 
     data.forEach(category => {
         const listcategory = `
-            <li><a href="">${category.name}</a></li>
+            <li><a href="/categories/${category._id}">${category.name}</a></li>
         `;
         containercategory.innerHTML += listcategory;
     });
@@ -55,34 +54,37 @@ async function logiAndLogout() {
       });
     if(response.ok) {
         const data = await response.json();
+        
         userInfo.innerHTML += `
-            <a href="/auth/logout">logout</a>
-        `;  
+            <a id="logout-btn">logout</a>
+        `;
+
+        document.getElementById('logout-btn').addEventListener('click', async function (event) {
+            event.preventDefault(); // Ngừng hành động mặc định của link
+        
+            // Gửi yêu cầu đến backend để xóa cookie
+            const response = await fetch('/auth/logout', {
+                method: 'GET',
+                credentials: 'include'  // Đảm bảo gửi cookie
+            });
+        
+            const data = await response.json();
+        
+            if (response.ok) {
+                // Sau khi logout thành công, chuyển hướng người dùng về trang đăng nhập
+                window.location.href = '/';
+            } else {
+                // Nếu có lỗi, hiển thị thông báo
+                alert('Logout failed: ' + data.message);
+            }
+        });
+        
     } else {
         userInfo.innerHTML += `
             <a href="/login">login</a>
         `;
     }
 }
-// document.getElementById('logout-btn').addEventListener('click', async function (event) {
-//     event.preventDefault(); // Ngừng hành động mặc định của link
-
-//     // Gửi yêu cầu đến backend để xóa cookie
-//     const response = await fetch('/auth/logout', {
-//         method: 'GET',
-//         credentials: 'include'  // Đảm bảo gửi cookie
-//     });
-
-//     const data = await response.json();
-
-//     if (response.ok) {
-//         // Sau khi logout thành công, chuyển hướng người dùng về trang đăng nhập
-//         window.location.href = '/';
-//     } else {
-//         // Nếu có lỗi, hiển thị thông báo
-//         alert('Logout failed: ' + data.message);
-//     }
-// });
 
 logiAndLogout();
 fetchStories();

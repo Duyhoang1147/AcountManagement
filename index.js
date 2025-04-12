@@ -28,6 +28,7 @@ app.use('/story', require('./routes/story'));
 app.use('/chapter', require('./routes/chapter'));
 app.use('/comment', require('./routes/comment'));
 app.use('/follow', require('./routes/follow'));
+app.use('/history', require('./routes/history'));
 
 //Định tuyến
 app.get('/', async (req, res) => {
@@ -54,8 +55,7 @@ app.get('/detail/:id/:chapterId', (req, res) => {
     res.render('chapter');
 });
 
-//admin router
-//author
+
 app.get('/admin/authors', (req, res) => {
     res.render('partials/navadmin', {
         viewFile: '../admin/author/index' 
@@ -129,6 +129,17 @@ app.get('/admin/stories/create', (req, res) => {
     res.render('partials/navadmin', {
         viewFile: '../admin/story/create' 
     });
+=======
+app.get('/follows', (req, res) => {
+    res.render('follow');
+});
+
+app.get('/history', (req, res) => {
+    res.render('history');
+});
+
+app.get('/categories/:id', (req, res) => {
+    res.render('category');
 });
 
 //trien khai localhost
