@@ -8,6 +8,7 @@ const upload = multer({dest: 'data/uploads/'});
 router.get('/:id', chapterController.getAllChapterbyIdStory)
 router.get('/get_chapter/:id', chapterController.GetChapterbyId)
 router.post('/', upload.array('images'), chapterController.createChapter);
+router.put('/:id', upload.array('images'), chapterController.updateChapter)
 router.delete('/:id', chapterController.removeChapter)
 
 module.exports = router

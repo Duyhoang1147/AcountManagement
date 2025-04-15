@@ -15,9 +15,11 @@ async function getIdUser() {
 async function getProfile() {
     const response = await fetch('http://localhost:8080/account/' + await getIdUser());
     const data = await response.json();
+    
     if(data === null) {
         container.innerHTML = '<p>No found user</p>';
     }
+
     const profile = `
     <h3 class="text-white text-center mb-4">Thông tin cá nhân</h3>
     <form id="updateUser">

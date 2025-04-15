@@ -39,10 +39,10 @@ const createAuthor = async (req, res) => {
 
 const updateAuthor = async (req, res) => {
     try {
-        const {name, description} = req.body;
+        const {name, decription} = req.body;
         const {id} = req.params;
         await Author.findByIdAndUpdate(
-            id, { name: name, decriptions: description}, 
+            id, { name: name, decriptions: decription}, 
             {new: true}
         );
         res.status(200).json({message: 'Author updated'});
