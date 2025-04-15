@@ -3,6 +3,19 @@ function formatDate(isoString) {
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   }
 
+  async function getUserid() {
+    const response = await fetch('/auth/me', {
+        method: 'GET',
+        credentials: 'include' // Gửi cookie kèm request
+    });
+
+    if(response.ok) {
+        const data = await response.json();
+        console.log(data.user._id)
+        return data.user._id
+    }
+}
+
 async function getStory() {
     const pathSegments = window.location.pathname.split('/');
     const storyId = pathSegments[pathSegments.length - 1];
@@ -39,8 +52,7 @@ async function getStory() {
                         </div>
                     </div>
                     <div class="anime__details__btn">
-                        <a href="#" class="follow-btn"><i class="fa fa-heart-o"></i> Follow</a>
-                        <a href="#" class="watch-btn"><span>Watch Now</span> <iclass="fa fa-angle-right"></i></a>
+                        <a href="#" class="follow-btn" id="follow_btn"><i class="fa fa-heart-o"></i> Follow</a>
                     </div>
                 </div>
             </div>
@@ -54,6 +66,47 @@ async function getStory() {
         if (bg) {
             element.style.backgroundImage = `url("${bg}")`;
             console.log("Loading image:", bg);
+        }
+    });
+
+    document.getElementById('follow_btn').addEventListener('click', async function (event) {
+        event.preventDefault();
+        const responseFollow = await fetch('http://localhost:8080/follow/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({userid: await getUserid(), storyid: data.story._id}),
+        })
+
+        if(responseFollow.ok) {
+            console.log("Followed already");
+            const userId = await getUserid(); // Lấy userId trước
+            const responseFollowDelete = await fetch(`http://localhost:8080/follow/${data.story._id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ userid: userId }) // Thêm userId vào body
+            });
+
+            if(responseFollowDelete.ok) {
+                console.log("Unfollowed successfully");
+                window.location.reload(); // Tải lại trang sau khi unfollow
+            } else {
+                console.error('Failed to unfollow:', await responseFollowDelete.text());
+            }
+        } else {
+            console.log("Not followed yet");
+            const responseFollowCreate = await fetch('http://localhost:8080/follow/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({userid: await getUserid(), storyid: data.story._id}),
+            });
+
+            if(responseFollowCreate.ok) {
+                console.log("Followed successfully");
+                window.location.reload(); // Tải lại trang sau khi follow
+            }
         }
     });
 }

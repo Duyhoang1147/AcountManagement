@@ -29,9 +29,38 @@ const createFollow = async (req, res) => {
 
 const deleteFollow = async (req, res) => {
     try {
-        const {id} = req.params;
-        await Follow.findByIdAndDelete(id);
-        res.status(200).json({message: 'follow deleted'});
+        const storyId = req.params.id;
+        const { userid } = req.body;
+
+        if (!storyId || !userid) {
+            return res.status(400).json({ message: 'Missing storyId or userId' });
+        }
+
+        const result = await Follow.findOneAndDelete({
+            storyId: storyId,
+            userId: userid
+        });
+
+        if (!result) {
+            return res.status(404).json({ message: 'Follow not found' });
+        }
+
+        return res.status(200).json({ message: 'Unfollowed successfully' });
+    } catch (error) {
+        console.error('Delete follow error:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+const checkExsis = async (req, res) => {
+    try {
+        const {userid, storyid} = req.body;
+        const follow = await Follow.findOne({userId: userid, storyId: storyid});
+        if(!follow) {
+            res.status(400).json({message: 'follow not found'});
+        } else {
+            res.status(200).json({message: 'follow found'});
+        }
     } catch(err) {
         res.status(500).json({message: 'Internal server error: ' + err});
     }
@@ -41,4 +70,5 @@ module.exports = {
     getAllFollowByUserId,
     createFollow,
     deleteFollow,
+    checkExsis,
 }

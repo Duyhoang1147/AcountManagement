@@ -2,7 +2,7 @@ const Category = require('../model/category');
 
 const getAllCategory = async (req, res) => {
     try {
-        const categories = await Category.find({});
+        const categories = await Category.find({isdeleted: false});
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({message: 'Internal server error'});
@@ -46,15 +46,14 @@ const updateCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
     try {
-        const {id} = req.body;
-        const deleteCategory = await Category.deleteOne(id);
-        if(deleteCategory.deletedCount === 0) {
-            res.status(404).json({message: 'Category not found'});
-        } else {
-            res.status(200).json({message: 'Category deleted successfully'});
-        }
+        const {id} = req.params;
+        const category = await Category.findById(id);
+
+        category.isdeleted = !category.isdeleted;
+        category.save();
+        res.status(200).json({message: 'Category deleted successfully'});
     } catch(error) {
-        res.status(500).json({message: 'Internal server error'});
+        res.status(500).json({message: 'Internal server error' + error});
     }
 }
 

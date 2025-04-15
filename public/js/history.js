@@ -18,6 +18,10 @@ async function getHistory() {
 
     const container = document.getElementById('histories');
     console.log("Container:", container);
+
+    if(data === null) {
+        container.innerHTML = '<p>You are not logged in.</p>';
+    }
     
     data.histories.forEach(history => {
         const story = history.storyId;

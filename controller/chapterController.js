@@ -112,9 +112,30 @@ const removeChapter = async (req, res) => {
     }
 }
 
+const updateChapter = async (req, res) => {
+    try {
+        const {chapterNumber, title, storyid} = req.body;
+        const chapter = await Chapter.findById(storyid);
+
+        if(chapter === null) {
+            return res.status(400).json({message: 'chapter not found'});
+        }
+
+        await Chapter.updateOne(
+            {chapterNumber: chapterNumber, title: title},
+            {new: true}
+        );
+
+        res.status(200).json({message: 'update chapter sucess'});
+    } catch(err) {
+        res.status(500).json({message: 'Internal server error: ' + err})
+    }
+}
+
 module.exports = {
     getAllChapterbyIdStory,
     GetChapterbyId,
     createChapter,
-    removeChapter
+    removeChapter,
+    updateChapter
 }

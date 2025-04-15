@@ -63,11 +63,11 @@ const createStory = async (req, res) => {
         const filePath = path.posix.join(folderpath, req.file.originalname);
         
         //kiem tra du lieu dau vao
-        const checkCategory = await Category.find({'_id': {$in: category}}).select('_id');
-        const categories = checkCategory.map(item => item._id.toString());
-        if(categories.length !== category.length) {
-            res.status(400).json({message: 'Category not found'});
-        }
+        // const checkCategory = await Category.find({'_id': {$in: category}}).select('_id');
+        // const categories = checkCategory.map(item => item._id.toString());
+        // if(categories.length !== category.length) {
+        //     res.status(400).json({message: 'Category not found'});
+        // }
         //tao truyen moi
         await Story.create({
             name: name,
@@ -77,7 +77,7 @@ const createStory = async (req, res) => {
             decriptions: decriptions,
             chapter: chapter,
             location: folderpath,
-            category: categories,
+            category: category,
             URLimage: filePathImage,
         });
         
